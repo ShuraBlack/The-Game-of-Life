@@ -27,6 +27,20 @@ Its fully based around the Java SDK and uses Java Swing and Graphics to draw bas
 
 ## How to use it?
 
-**SPACE** - Will create a fresh generation and kill all existing ones
+Basic:
 
-**Color Indicator** - The longer the cell lives, the redder it becomes
+- **SPACE** - Will create a fresh generation and kill all existing cells
+
+- **Color Indicator** - The longer the cell lives, the redder it becomes
+
+- **ESC** - Close the application
+
+Edit:
+
+- **ENTER** - Enter or leave the Edit mode
+
+- **LEFT MOUSE** - Make a cell alive *(Only edit mode)*
+
+- **RIGHT MOUSE** - Kills a cell *(Only edit mode)*
+
+- **DELETE** - Will kill all cells *(Only edit mode)*
