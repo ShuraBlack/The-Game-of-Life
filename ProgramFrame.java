@@ -35,7 +35,7 @@ public class ProgramFrame extends JFrame {
         this.setVisible(true);
 
         // Set the application to fullscreen mode
-        //fullscreenMode();
+        fullscreenMode();
     }
 
     private void fullscreenMode () {

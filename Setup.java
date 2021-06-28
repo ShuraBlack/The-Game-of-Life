@@ -3,10 +3,7 @@ import util.Constant;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -18,6 +15,10 @@ public class Setup extends JPanel implements ActionListener {
 
     private Rect[][] grid;
 
+    private boolean editMode = false;
+    private Timer timer;
+    private static Setup INSTANCE;
+
     /**
      * Contructor for setup and basic configuration
      */
@@ -27,8 +28,10 @@ public class Setup extends JPanel implements ActionListener {
         this.setBackground(new Color(0,0,0));
         this.setFocusable(true);
         this.addKeyListener(new CustomKeyAdapater());
+        this.addMouseListener(new CustomMouseAdapter());
+        INSTANCE = this;
 
-        Timer timer = new Timer(Constant.DELAY, this);
+        timer = new Timer(Constant.DELAY, this);
         timer.start();
 
         grid = new Rect[Constant.COLS][Constant.ROWS];
@@ -137,7 +140,7 @@ public class Setup extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         calculate();
-        repaint();
+        paint(INSTANCE.getGraphics());
     }
 
     private class CustomKeyAdapater extends KeyAdapter {
@@ -145,7 +148,65 @@ public class Setup extends JPanel implements ActionListener {
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                 randomGrid();
+                if (editMode) {
+                    paint(INSTANCE.getGraphics());
+                }
+            } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                System.exit(0);
+            } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (editMode) {
+                    timer.restart();
+                    editMode = false;
+                } else {
+                    timer.stop();
+                    editMode = true;
+                    Graphics g = INSTANCE.getGraphics();
+                    g.setColor(new Color(255,255,255));
+                    g.drawString("EDIT MODE",10,10);
+                }
+            } else if (editMode && e.getKeyCode() == KeyEvent.VK_DELETE) {
+                for (int i = 0; i < Constant.COLS; i++) {
+                    for (int j = 0; j < Constant.ROWS ; j++) {
+                        if (grid[i][j].state == 0) {
+                            continue;
+                        }
+
+                        grid[i][j].state = 0;
+                        grid[i][j].color = new Color(0,0,0);
+                    }
+                }
+                paint(INSTANCE.getGraphics());
             }
         }
+    }
+    private class CustomMouseAdapter extends MouseAdapter {
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (!editMode) {
+                return;
+            }
+            Point point = e.getLocationOnScreen();
+            int x = point.x;
+            int y = point.y;
+            if (x > Constant.WIDTH || x < 0) {
+                return;
+            }
+            if (y > Constant.HEIGHT || y < 0) {
+                return;
+            }
+
+            int i = x / Constant.RESOLUTION;
+            int j = y / Constant.RESOLUTION;
+
+            if (e.getButton() == 1) {
+                grid[i][j].state = 1;
+                grid[i][j].color = new Color(255,255,255);
+            } else if (e.getButton() == 3) {
+                grid[i][j].state = 0;
+            }
+            paint(INSTANCE.getGraphics());
+        }
+
     }
 }
